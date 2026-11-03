@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-sm border-t-4 border-blue-600">
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <h2 class="text-2xl font-bold text-gray-800"><i class="fas fa-tags text-blue-600 mr-2"></i> Manajemen Klasifikasi</h2>
+            <a href="/" class="bg-gray-500 text-white px-4 py-2 rounded text-sm font-bold shadow hover:bg-gray-600">Kembali</a>
+        </div>
+
+        <!-- Form Tambah Klasifikasi Baru -->
+        <div class="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-100">
+            <h3 class="font-bold text-blue-800 mb-3 text-sm">Tambah Kode Klasifikasi Baru</h3>
+            <form action="/api/tambah-klasifikasi" method="POST" class="flex items-center gap-3">
+                <input type="text" name="kode_klasifikasi" required placeholder="Contoh: KP.01" class="border px-3 py-2 rounded text-sm w-32 focus:ring-blue-500 outline-none">
+                <input type="text" name="keterangan" required placeholder="Keterangan (Cth: Kepegawaian)" class="border px-3 py-2 rounded text-sm flex-1 focus:ring-blue-500 outline-none">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold text-sm transition"><i class="fas fa-plus mr-1"></i> Tambah</button>
+            </form>
+        </div>
+
+        <!-- Tabel Daftar Klasifikasi -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr>
+                        <th class="px-4 py-3 w-1/4">Kode Klasifikasi</th>
+                        <th class="px-4 py-3 w-1/2">Keterangan</th>
+                        <th class="px-4 py-3 text-center w-1/4">Aksi (Ubah & Simpan)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <% klasifikasi.forEach(function(k) { %>
+                        <tr class="hover:bg-gray-50 transition">
+                            <!-- Form Edit Langsung (Inline) -->
+                            <form action="/api/edit-klasifikasi" method="POST">
+                                <!-- Input tersembunyi untuk menyimpan kode lama sebagai acuan edit -->
+                                <input type="hidden" name="kode_klasifikasi_lama" value="<%= k.kode_klasifikasi %>">
+                                
+                                <td class="px-4 py-2">
+                                    <input type="text" name="kode_klasifikasi_baru" value="<%= k.kode_klasifikasi %>" required class="border px-2 py-1 rounded w-full font-bold text-blue-800 focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-2">
+                                    <input type="text" name="keterangan" value="<%= k.keterangan %>" required class="border px-2 py-1 rounded w-full focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-2 text-center">
+                                    <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 px-3 py-1.5 rounded text-xs font-bold transition shadow-sm"><i class="fas fa-save mr-1"></i> Simpan Edit</button>
+                                </td>
+                                <td class="px-4 py-2 flex items-center justify-center gap-2">
+                                    <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 px-3 py-1.5 rounded text-xs font-bold shadow-sm">Simpan</button>
+    <!-- Tombol Hapus -->
+                                    <button type="submit" formaction="/api/delete-klasifikasi" onclick="return confirm('Yakin menghapus klasifikasi ini?')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </form>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

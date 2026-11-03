@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-sm">
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <h2 class="text-2xl font-bold text-yellow-600"><i class="fas fa-ticket-alt mr-2"></i>Daftar Pengambilan Nomor Surat (Draft)</h2>
+            <a href="/" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 shadow-sm">Kembali</a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-yellow-50 text-yellow-900">
+                    <tr>
+                        <th class="px-4 py-3">No. Urut Surat</th>
+                        <th class="px-4 py-3">Tgl Dibuat</th>
+                        <th class="px-4 py-3">Tujuan</th>
+                        <th class="px-4 py-3">Perihal</th>
+                        <th class="px-4 py-3 font-extrabold text-blue-700">Akun Pengambil</th>
+                        <th class="px-4 py-3 text-center">Status</th>
+                        <th class="px-4 py-3 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <% data.forEach(function(surat) { %>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 font-bold text-gray-800"><%= surat.nomor_tergenerate %></td>
+                            <td class="px-4 py-3"><%= new Date(surat.tanggal_surat).toLocaleDateString('id-ID') %></td>
+                            <td class="px-4 py-3"><%= surat.tujuan %></td>
+                            <td class="px-4 py-3"><%= surat.perihal %></td>
+                            <td class="px-4 py-3 font-bold text-blue-600"><%= surat.penginput || 'Tidak diketahui' %></td>
+                            <td class="px-4 py-3 text-center">
+                                <a href="/lengkapi-surat/<%= surat.id %>" class="inline-block bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-blue-700 shadow transition">
+                                    <i class="fas fa-upload mr-1"></i> Lengkapi Data
+                                </a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

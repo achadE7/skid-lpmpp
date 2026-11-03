@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-7xl mx-auto bg-white p-6 rounded-xl shadow-sm">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <h2 class="text-2xl font-bold text-blue-900"><%= title %></h2>
+            <div class="flex gap-2">
+                <a href="/surat-keluar" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 shadow-sm font-semibold">Buat Surat Keluar</a>
+                <a href="/" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 shadow-sm font-semibold">Kembali</a>
+            </div>
+        </div>
+
+        <!-- Menu Filter & Search -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4 bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <span class="text-sm font-semibold text-blue-800"><i class="fas fa-filter mr-1"></i> Filter Tahun:</span>
+                <select id="filterTahun" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    <option value="">Semua Tahun</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+            <div class="relative w-full md:w-80">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fas fa-search"></i></span>
+                <input type="text" id="searchInput" placeholder="Cari nomor, tujuan, perihal, atau admin..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm">
+            </div>
+        </div>
+
+        <!-- Tabel Data -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-blue-100 text-blue-900">
+                    <tr>
+                        <th class="px-4 py-3">Nomor Surat</th>
+                        <th class="px-4 py-3">Tanggal</th>
+                        <th class="px-4 py-3">Tujuan</th>
+                        <th class="px-4 py-3">Perihal</th>
+                        <th class="px-4 py-3">Lokasi Arsip</th>
+                        <th class="px-4 py-3 text-blue-700 font-extrabold">Diinput Oleh</th>
+                        <th class="px-4 py-3 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="divide-y divide-gray-100">
+                    <% data.forEach(function(surat) { %>
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3 font-medium"><%= surat.nomor_tergenerate || surat.nomor_surat %></td>
+                            <td class="px-4 py-3"><%= new Date(surat.tanggal_surat).toLocaleDateString('id-ID') %></td>
+                            <td class="px-4 py-3"><%= surat.tujuan %></td>
+                            <td class="px-4 py-3"><%= surat.perihal %></td>
+                            
+                            <!-- Menampilkan Lokasi Fisik -->
+                            <td class="px-4 py-3">
+                                <% if(surat.nama_ruangan) { %>
+                                    <div class="text-xs leading-relaxed">
+                                        <span class="font-semibold text-gray-700"><%= surat.nama_ruangan %></span> &rarr; 
+                                        <%= surat.nama_kabinet %> &rarr; <%= surat.nama_laci %> &rarr; 
+                                        <span class="font-semibold text-yellow-600"><%= surat.nama_ordner %></span>
+                                    </div>
+                                <% } else { %>
+                                    <span class="text-xs text-gray-400 italic">Tidak diatur</span>
+                                <% } %>
+                            </td>
+
+                            <td class="px-4 py-3 font-bold text-blue-600"><%= surat.penginput || 'Sistem' %></td>
+                            <td class="px-4 py-3 text-center flex justify-center gap-2">
+    <!-- Tombol PDF -->
+                            <% if(surat.link_google_drive) { %>
+                            <a href="<%= surat.link_google_drive %>" target="_blank" class="bg-blue-200 text-blue-800 px-3 py-1 rounded text-xs font-bold">PDF</a>
+                            <% } %>
+    
+    <!-- Tombol Edit -->
+                            <a href="/edit-surat-keluar/<%= surat.id %>" class="bg-yellow-400 text-yellow-900 px-3 py-1 rounded text-xs font-bold">Edit</a>
+    
+    <!-- Tombol Hapus -->
+                            <form action="/api/delete-surat-keluar/<%= surat.id %>" method="POST" onsubmit="return confirm('Yakin ingin menghapus surat ini permanen?');">
+                            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded text-xs font-bold hover:bg-red-600">Hapus</button>
+                            </form>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pesan Data Tidak Ditemukan -->
+        <div id="noDataMessage" class="hidden text-center py-8 text-gray-500 font-medium">
+            Data surat tidak ditemukan.
+        </div>
+    </div>
+
+    <!-- Script Search & Filter Interaktif -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            const filterTahun = document.getElementById('filterTahun');
+            const tableRows = document.querySelectorAll('#tableBody tr');
+            const noDataMessage = document.getElementById('noDataMessage');
+
+            function saringTabel() {
+                const kataKunci = searchInput.value.toLowerCase();
+                const tahunPilihan = filterTahun.value;
+                let dataDitemukan = false;
+
+                tableRows.forEach(row => {
+                    const teksBaris = row.textContent.toLowerCase();
+                    const kolomTanggal = row.cells[1].textContent; 
+
+                    const cocokKataKunci = teksBaris.includes(kataKunci);
+                    const cocokTahun = tahunPilihan === "" || kolomTanggal.includes(tahunPilihan);
+
+                    if (cocokKataKunci && cocokTahun) {
+                        row.style.display = '';
+                        dataDitemukan = true;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                noDataMessage.style.display = dataDitemukan ? 'none' : 'block';
+            }
+
+            searchInput.addEventListener('keyup', saringTabel);
+            filterTahun.addEventListener('change', saringTabel);
+        });
+    </script>
+</body>
+</html>

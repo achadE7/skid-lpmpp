@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center p-8">
+    <div class="max-w-xl w-full bg-white p-8 rounded-2xl shadow-lg text-center border-t-8 border-blue-600">
+        <i class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Berhasil! Nomor Surat Anda:</h2>
+        
+        <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-6 my-6">
+            <p class="text-3xl font-extrabold text-blue-700 tracking-wider" id="nomorTeks"><%= nomor %></p>
+        </div>
+
+        <div class="text-left bg-blue-50 p-4 rounded-md mb-6 text-sm text-blue-900">
+            <p><strong>Diberikan kepada:</strong> <%= peminta %></p>
+            <p><strong>Perihal:</strong> <%= perihal %></p>
+        </div>
+
+        <div class="flex gap-4">
+            <button onclick="navigator.clipboard.writeText('<%= nomor %>'); alert('Nomor di-copy!');" class="w-1/2 bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-md hover:bg-gray-300">
+                <i class="fas fa-copy mr-2"></i> Copy Nomor
+            </button>
+            <a href="/" class="w-1/2 bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700 transition block">
+                Kembali ke Dashboard
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tambahan FontAwesome untuk Ikon -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-sm">
+        <h2 class="text-2xl font-bold mb-6 text-blue-900">Registrasi Surat Keluar</h2>
+        <form action="/api/surat-keluar" method="POST" enctype="multipart/form-data" class="space-y-4">
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tanggal Surat</label>
+                    <input type="date" name="tanggal_surat" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Kode Klasifikasi</label>
+                    <div class="flex gap-2 mt-1">
+                        <select name="kode_klasifikasi" id="kode_klasifikasi" required class="block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 bg-white text-gray-700">
+                            <option value="">-- Pilih Klasifikasi --</option>
+                        </select>
+                        <button type="button" onclick="tambahKlasifikasi()" class="bg-blue-100 text-blue-700 px-3 py-2 rounded-md hover:bg-blue-200 font-bold" title="Tambah Klasifikasi Baru">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tujuan Surat</label>
+                    <input type="text" name="tujuan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500">
+                </div>
+                <div>
+                <label class="block text-sm font-medium text-gray-700">Tipe Berkas (Sesuai JRA)</label>
+                <select name="tipe_berkas" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 bg-white text-gray-700">
+                <option value="" disabled selected>-- Pilih Tipe Berkas --</option>
+                <option value="Surat Undangan">Surat Undangan</option>
+                <option value="SK Kegiatan">SK Kegiatan (Aktif 1 Tahun)</option>
+                <option value="SK Jabatan">SK Jabatan (Aktif 4 Tahun)</option>
+                <option value="Surat Edaran">Surat Edaran</option>
+                <option value="Surat Tugas">Surat Tugas</option>
+                <option value="Nota Dinas">Nota Dinas</option>
+                </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Perihal</label>
+                <input type="text" name="perihal" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Dokumen PDF</label>
+                <input type="file" name="file" accept="application/pdf" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            </div>
+            
+            <div class="col-span-full mt-4 border-t pt-4">
+                <h3 class="text-md font-semibold text-gray-700 mb-3">Lokasi Fisik Arsip Asli (Opsional)</h3>
+                <div class="grid grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Ruangan</label>
+                        <select id="ruangan" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500">
+                            <option value="">-- Pilih --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Kabinet</label>
+                        <select id="kabinet" disabled class="mt-1 block w-full border border-gray-300 rounded-md p-2 bg-gray-50">
+                            <option value="">-- Pilih --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Laci</label>
+                        <select id="laci" disabled class="mt-1 block w-full border border-gray-300 rounded-md p-2 bg-gray-50">
+                            <option value="">-- Pilih --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Ordner</label>
+                        <select id="ordner" name="id_lokasi" disabled class="mt-1 block w-full border border-gray-300 rounded-md p-2 bg-gray-50 focus:ring-blue-500">
+                            <option value="">-- Pilih --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol disusun vertikal -->
+            <div class="flex flex-col gap-3 mt-8 border-t pt-6">
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700 transition">
+                    Cetak Nomor & Unggah ke Drive
+                </button>
+                <a href="/" class="w-full text-center bg-gray-500 text-white font-bold py-3 px-4 rounded-md hover:bg-gray-600 transition">
+                    Kembali ke Dashboard
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+    // --- 1. Fungsi Load & Tambah Klasifikasi ---
+    const elKlasifikasi = document.getElementById('kode_klasifikasi');
+            
+    async function loadKlasifikasi() {
+        try {
+            const res = await fetch('/api/klasifikasi');
+            const data = await res.json();
+            elKlasifikasi.innerHTML = '<option value="">-- Pilih Klasifikasi --</option>';
+            data.forEach(item => {
+                elKlasifikasi.innerHTML += `<option value="${item.kode_klasifikasi}">${item.kode_klasifikasi} - ${item.uraian}</option>`;
+            });
+        } catch (error) {
+            console.error("Gagal memuat data klasifikasi", error);
+        }
+    }
+    loadKlasifikasi();
+
+    async function tambahKlasifikasi() {
+        const kode = prompt("Masukkan Kode Klasifikasi Baru (Contoh: HM.01.02):");
+        if (!kode) return;
+        const uraian = prompt("Masukkan Uraian/Nama Klasifikasi:");
+        if (!uraian) return;
+
+        try {
+            const res = await fetch('/api/klasifikasi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ kode, uraian })
+            });
+            const result = await res.json();
+            if (result.success) {
+                alert("Klasifikasi berhasil ditambahkan!");
+                loadKlasifikasi(); 
+            } else {
+                alert("Gagal menambahkan data.");
+            }
+        } catch (error) {
+            alert("Terjadi kesalahan server saat menyimpan klasifikasi.");
+        }
+    }
+
+    // --- 2. Fungsi Load Lokasi Fisik Arsip ---
+    const elRuangan = document.getElementById('ruangan');
+    const elKabinet = document.getElementById('kabinet');
+    const elLaci = document.getElementById('laci');
+    const elOrdner = document.getElementById('ordner');
+
+    fetch('/api/lokasi/ruangan')
+        .then(res => res.json())
+        .then(data => data.forEach(item => elRuangan.innerHTML += `<option value="${item.id}">${item.nama_ruangan}</option>`));
+
+    elRuangan.addEventListener('change', function() {
+        resetSelect(elKabinet); resetSelect(elLaci); resetSelect(elOrdner);
+        if(!this.value) return;
+        fetch(`/api/lokasi/kabinet/${this.value}`)
+            .then(res => res.json())
+            .then(data => populateSelect(elKabinet, data, 'id', 'nama_kabinet'));
+    });
+
+    elKabinet.addEventListener('change', function() {
+        resetSelect(elLaci); resetSelect(elOrdner);
+        if(!this.value) return;
+        fetch(`/api/lokasi/laci/${this.value}`)
+            .then(res => res.json())
+            .then(data => populateSelect(elLaci, data, 'id', 'nama_laci'));
+    });
+
+    elLaci.addEventListener('change', function() {
+        resetSelect(elOrdner);
+        if(!this.value) return;
+        fetch(`/api/lokasi/ordner/${this.value}`)
+            .then(res => res.json())
+            .then(data => {
+                populateSelect(elOrdner, data, 'id', 'nama_ordner');
+                elOrdner.disabled = false;
+                elOrdner.classList.remove('bg-gray-50');
+            });
+    });
+
+    function resetSelect(el) {
+        el.innerHTML = '<option value="">-- Pilih --</option>';
+        el.disabled = true;
+        el.classList.add('bg-gray-50');
+    }
+    
+    function populateSelect(el, data, idKey, nameKey) {
+        data.forEach(item => el.innerHTML += `<option value="${item[idKey]}">${item[nameKey]}</option>`);
+        el.disabled = false;
+        el.classList.remove('bg-gray-50');
+    }
+    </script>
+</body>
+</html>

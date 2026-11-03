@@ -1,0 +1,23 @@
+# Dependency directories
+node_modules/
+
+# Environment Variables (SANGAT KRUSIAL)
+.env
+
+# Google Drive API Credentials (SANGAT KRUSIAL)
+credentials.json
+token.json
+*-key.json
+*.pem
+
+# File unggahan sementara dari Multer
+uploads/
+public/uploads/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+npm-debug.log*
+yarn-debug.log*

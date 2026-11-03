@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border-t-4 border-blue-600">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <h2 class="text-2xl font-bold text-gray-800"><i class="fas fa-edit text-blue-600 mr-2"></i> Edit Surat Keluar</h2>
+            <a href="/data-surat-keluar" class="bg-gray-500 text-white px-4 py-2 rounded text-sm font-bold shadow hover:bg-gray-600 transition">Kembali</a>
+        </div>
+
+        <!-- Info Surat (Read-Only) -->
+        <div class="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-100 text-sm text-gray-700 flex flex-col md:flex-row gap-4 md:gap-12">
+            <div>
+                <p class="text-xs text-blue-500 font-bold uppercase tracking-wider mb-1">Nomor Surat</p>
+                <p class="font-mono text-blue-900 font-bold text-lg"><%= surat.nomor_tergenerate || surat.nomor_surat %></p>
+            </div>
+            <div>
+                <p class="text-xs text-blue-500 font-bold uppercase tracking-wider mb-1">Tanggal Surat</p>
+                <p class="font-bold text-gray-800"><%= new Date(surat.tanggal_surat).toLocaleDateString('id-ID') %></p>
+            </div>
+        </div>
+
+        <!-- Form Edit -->
+        <form action="/api/edit-surat-keluar/<%= surat.id %>" method="POST">
+            
+            <div class="mb-5">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Tujuan Surat <span class="text-red-500">*</span></label>
+                <input type="text" name="tujuan" value="<%= surat.tujuan %>" required 
+                       class="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+            </div>
+
+            <div class="mb-8">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Perihal <span class="text-red-500">*</span></label>
+                <textarea name="perihal" rows="3" required 
+                          class="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"><%= surat.perihal %></textarea>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <a href="/data-surat-keluar" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-md text-sm font-bold hover:bg-gray-300 transition">Batal</a>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md text-sm font-bold hover:bg-blue-700 shadow-sm transition">
+                    <i class="fas fa-save mr-2"></i> Simpan Perubahan
+                </button>
+            </div>
+            <!-- Edit Lokasi Fisik -->
+            <div class="mb-8 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 class="text-sm font-bold text-gray-800 mb-2">Pindah Lokasi Fisik Arsip (Opsional)</h3>
+                <p class="text-xs text-gray-500 mb-4">Abaikan form ini jika lokasi arsip fisik tidak berpindah.</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Ruangan</label>
+                        <select id="ruangan" class="w-full border border-gray-300 rounded py-1.5 px-2 text-sm focus:ring-blue-500"><option value="">-- Pilih --</option></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Kabinet</label>
+                        <select id="kabinet" class="w-full border border-gray-300 rounded py-1.5 px-2 text-sm focus:ring-blue-500" disabled><option value="">-- Pilih --</option></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Laci</label>
+                        <select id="laci" class="w-full border border-gray-300 rounded py-1.5 px-2 text-sm focus:ring-blue-500" disabled><option value="">-- Pilih --</option></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Ordner</label>
+                        <select id="ordner" name="id_lokasi" class="w-full border border-gray-300 rounded py-1.5 px-2 text-sm focus:ring-blue-500" disabled><option value="">-- Pilih --</option></select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- Tambahkan script cascading ini tepat di atas tag penutup </body> -->
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    fetch('/api/lokasi/ruangan').then(r => r.json()).then(d => {
+                        const rSelect = document.getElementById('ruangan');
+                        d.forEach(r => rSelect.add(new Option(r.nama_ruangan, r.id)));
+                    });
+                    document.getElementById('ruangan').addEventListener('change', function() {
+                        const kSelect = document.getElementById('kabinet'); kSelect.innerHTML = '<option value="">-- Pilih --</option>'; kSelect.disabled = !this.value;
+                        if(this.value) fetch(`/api/lokasi/kabinet/${this.value}`).then(r => r.json()).then(d => d.forEach(k => kSelect.add(new Option(k.nama_kabinet, k.id))));
+                    });
+                    document.getElementById('kabinet').addEventListener('change', function() {
+                        const lSelect = document.getElementById('laci'); lSelect.innerHTML = '<option value="">-- Pilih --</option>'; lSelect.disabled = !this.value;
+                        if(this.value) fetch(`/api/lokasi/laci/${this.value}`).then(r => r.json()).then(d => d.forEach(l => lSelect.add(new Option(l.nama_laci, l.id))));
+                    });
+                    document.getElementById('laci').addEventListener('change', function() {
+                        const oSelect = document.getElementById('ordner'); oSelect.innerHTML = '<option value="">-- Pilih --</option>'; oSelect.disabled = !this.value;
+                        if(this.value) fetch(`/api/lokasi/ordner/${this.value}`).then(r => r.json()).then(d => d.forEach(o => oSelect.add(new Option(o.nama_ordner, o.id))));
+                    });
+                });
+            </script>
+</body>
+</html>

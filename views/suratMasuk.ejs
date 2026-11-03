@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-sm">
+        <h2 class="text-2xl font-bold mb-6 text-green-700">Registrasi Surat Masuk</h2>
+
+        <form action="/api/surat-masuk" method="POST" enctype="multipart/form-data" class="space-y-4">
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nomor Surat Asli (dari Pengirim)</label>
+                    <input type="text" name="nomor_surat" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Instansi Pengirim</label>
+                    <input type="text" name="pengirim" required placeholder="misal: Kemdikbudristek" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Kode Klasifikasi</label>
+                    <div class="flex gap-2 mt-1">
+                        <select name="kode_klasifikasi" id="kode_klasifikasi" required class="block w-full border border-gray-300 rounded-md p-2 focus:ring-green-500">
+                            <option value="">-- Pilih Klasifikasi --</option>
+                        </select>
+                        <button type="button" onclick="tambahKlasifikasi()" class="bg-blue-100 text-blue-700 px-3 py-2 rounded-md hover:bg-blue-200 font-bold" title="Tambah Klasifikasi Baru">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nomor Surat Revisi (LPMPP)</label>
+                    <input type="text" name="nomor_surat_revisi" placeholder="Hasil revisi nomor..." class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-500 bg-green-50">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tanggal Surat</label>
+                    <input type="date" name="tanggal_surat" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tanggal Terima</label>
+                    <input type="date" name="tanggal_terima" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-500">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Perihal</label>
+                <input type="text" name="perihal" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-500">
+            </div>
+
+            <!-- Tipe Berkas (JRA) -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Berkas (Penentu Masa Retensi/JRA)</label>
+                <select name="tipe_berkas" required class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-green-500 focus:border-green-500 sm:text-sm">
+                    <option value="">-- Pilih Tipe Berkas --</option>
+                    <option value="Surat Biasa">Surat Biasa</option>
+                    <option value="Surat Tugas">Surat Tugas</option>
+                    <option value="Undangan">Undangan</option>
+                    <option value="SK Kegiatan">SK Kegiatan (Aktif 1 Tahun)</option>
+                    <option value="SK Jabatan">SK Jabatan (Aktif 4 Tahun)</option>
+                </select>
+            </div>
+
+            <!-- Lokasi Fisik Arsip -->
+            <div class="mb-6 bg-green-50 p-4 rounded-lg border border-green-100">
+                <h3 class="text-sm font-bold text-green-800 mb-3">Lokasi Fisik Arsip Asli (Opsional)</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-green-700 mb-1">Ruangan</label>
+                        <select id="ruangan" class="w-full border border-gray-300 rounded-md py-1.5 px-2 text-sm focus:ring-green-500 focus:border-green-500">
+                            <option value="">-- Pilih --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-green-700 mb-1">Kabinet</label>
+                        <select id="kabinet" class="w-full border border-gray-300 rounded-md py-1.5 px-2 text-sm focus:ring-green-500 focus:border-green-500" disabled>
+                            <option value="">-- Pilih --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-green-700 mb-1">Laci</label>
+                        <select id="laci" class="w-full border border-gray-300 rounded-md py-1.5 px-2 text-sm focus:ring-green-500 focus:border-green-500" disabled>
+                            <option value="">-- Pilih --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-green-700 mb-1">Ordner</label>
+                        <!-- Atribut name="id_lokasi" ada di sini agar tersimpan ke database -->
+                        <select id="ordner" name="id_lokasi" class="w-full border border-gray-300 rounded-md py-1.5 px-2 text-sm focus:ring-green-500 focus:border-green-500" disabled>
+                            <option value="">-- Pilih --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Dokumen PDF (Hasil Scan)</label>
+                <input type="file" name="file" accept="application/pdf" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+            </div>
+
+            <!-- Letak Dropdown Lokasi Fisik Arsip (Gunakan script Anda yang sudah ada sebelumnya di sini jika diperlukan) -->
+
+            <!-- Tombol Action Bersusun -->
+            <div class="flex flex-col gap-3 mt-8 border-t pt-6">
+                <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 transition">
+                    Arsipkan & Unggah ke Drive
+                </button>
+                <a href="/" class="w-full text-center bg-gray-500 text-white font-bold py-3 px-4 rounded-md hover:bg-gray-600 transition">
+                    Kembali ke Dashboard
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Fungsi Load & Tambah Klasifikasi
+        const elKlasifikasi = document.getElementById('kode_klasifikasi');
+
+        async function loadKlasifikasi() {
+            const res = await fetch('/api/klasifikasi');
+            const data = await res.json();
+            elKlasifikasi.innerHTML = '<option value="">-- Pilih Klasifikasi --</option>';
+            data.forEach(item => {
+                elKlasifikasi.innerHTML += `<option value="${item.kode_klasifikasi}">${item.kode_klasifikasi} - ${item.uraian}</option>`;
+            });
+        }
+        loadKlasifikasi(); // Panggil saat halaman dimuat
+
+        async function tambahKlasifikasi() {
+            const kode = prompt("Masukkan Kode Klasifikasi Baru (Contoh: HM.01.02):");
+            if (!kode) return;
+            const uraian = prompt("Masukkan Uraian/Nama Klasifikasi:");
+            if (!uraian) return;
+
+            const res = await fetch('/api/klasifikasi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ kode, uraian })
+            });
+            const result = await res.json();
+            if (result.success) {
+                alert("Klasifikasi berhasil ditambahkan!");
+                loadKlasifikasi(); // Segarkan dropdown
+            } else {
+                alert("Gagal menambahkan data.");
+            }
+        }
+
+        // ... (Letakkan fungsi load Lokasi Fisik ruangan/kabinet/laci/ordner Anda di sini) ...
+
+        // --- Logika Otomatisasi Nomor Revisi ---
+    const elTglTerima = document.querySelector('input[name="tanggal_terima"]');
+    const elNomorRevisi = document.querySelector('input[name="nomor_surat_revisi"]');
+
+    function generateNomorRevisi() {
+        const tgl = elTglTerima.value;
+        const klas = elKlasifikasi.value;
+        
+        if (tgl && klas) {
+            const dateObj = new Date(tgl);
+            const year = dateObj.getFullYear();
+            const month = dateObj.getMonth() + 1; // getMonth dimulai dari 0
+            const romanMonths = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+            const romanMonth = romanMonths[month - 1];
+            
+            // Output misal: PP.01.02/UN10.L2/XI/2026
+            elNomorRevisi.value = `${klas}/UN10.L2/${romanMonth}/${year}`;
+        }
+    }
+
+    elTglTerima.addEventListener('change', generateNomorRevisi);
+    elKlasifikasi.addEventListener('change', generateNomorRevisi);
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ambil data ruangan saat halaman dimuat
+        fetch('/api/lokasi/ruangan')
+            .then(res => res.json())
+            .then(data => {
+                const ruanganSelect = document.getElementById('ruangan');
+                data.forEach(r => ruanganSelect.add(new Option(r.nama_ruangan, r.id)));
+            });
+
+        // Event listener saat ruangan dipilih -> ambil kabinet
+        document.getElementById('ruangan').addEventListener('change', function() {
+            const kabinetSelect = document.getElementById('kabinet');
+            const laciSelect = document.getElementById('laci');
+            const ordnerSelect = document.getElementById('ordner');
+            
+            kabinetSelect.innerHTML = '<option value="">-- Pilih --</option>';
+            laciSelect.innerHTML = '<option value="">-- Pilih --</option>';
+            ordnerSelect.innerHTML = '<option value="">-- Pilih --</option>';
+            
+            kabinetSelect.disabled = !this.value;
+            laciSelect.disabled = true;
+            ordnerSelect.disabled = true;
+
+            if (this.value) {
+                fetch(`/api/lokasi/kabinet/${this.value}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        data.forEach(k => kabinetSelect.add(new Option(k.nama_kabinet, k.id)));
+                    });
+            }
+        });
+
+        // Event listener saat kabinet dipilih -> ambil laci
+        document.getElementById('kabinet').addEventListener('change', function() {
+            const laciSelect = document.getElementById('laci');
+            const ordnerSelect = document.getElementById('ordner');
+            
+            laciSelect.innerHTML = '<option value="">-- Pilih --</option>';
+            ordnerSelect.innerHTML = '<option value="">-- Pilih --</option>';
+            
+            laciSelect.disabled = !this.value;
+            ordnerSelect.disabled = true;
+
+            if (this.value) {
+                fetch(`/api/lokasi/laci/${this.value}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        data.forEach(l => laciSelect.add(new Option(l.nama_laci, l.id)));
+                    });
+            }
+        });
+
+        // Event listener saat laci dipilih -> ambil ordner
+        document.getElementById('laci').addEventListener('change', function() {
+            const ordnerSelect = document.getElementById('ordner');
+            ordnerSelect.innerHTML = '<option value="">-- Pilih --</option>';
+            ordnerSelect.disabled = !this.value;
+
+            if (this.value) {
+                fetch(`/api/lokasi/ordner/${this.value}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        data.forEach(o => ordnerSelect.add(new Option(o.nama_ordner, o.id)));
+                    });
+            }
+        });
+    });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Lengkapi Data Surat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-sm border-t-4 border-blue-600">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Lengkapi Data Surat Draft</h2>
+        
+        <div class="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-100 text-sm">
+            <p><strong>Nomor Surat:</strong> <%= surat.nomor_tergenerate %></p>
+            <p><strong>Tujuan:</strong> <%= surat.tujuan %></p>
+            <p><strong>Perihal:</strong> <%= surat.perihal %></p>
+            <p><strong>Diambil Oleh:</strong> <%= surat.penginput %></p>
+        </div>
+
+        <form action="/api/lengkapi-surat/<%= surat.id %>" method="POST" enctype="multipart/form-data">
+            <!-- Tipe Berkas -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Berkas (JRA)</label>
+                <select name="tipe_berkas" required class="w-full border border-gray-300 rounded py-2 px-3 text-sm focus:ring-blue-500">
+                    <option value="">-- Pilih --</option>
+                    <option value="Surat Biasa">Surat Biasa</option>
+                    <option value="Surat Tugas">Surat Tugas</option>
+                    <option value="Undangan">Undangan</option>
+                    <option value="SK Kegiatan">SK Kegiatan (Aktif 1 Tahun)</option>
+                    <option value="SK Jabatan">SK Jabatan (Aktif 4 Tahun)</option>
+                </select>
+            </div>
+
+            <!-- Upload PDF -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Upload File PDF Final</label>
+                <input type="file" name="file" accept=".pdf" required class="w-full border border-gray-300 p-2 rounded text-sm bg-gray-50">
+            </div>
+
+            <div class="flex justify-end gap-2 mt-4">
+                <a href="/data-pengambilan-nomor" class="bg-gray-500 text-white px-4 py-2 rounded text-sm font-bold">Batal</a>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-700">Simpan & Upload</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
